@@ -26,5 +26,5 @@ RUN dpkg-reconfigure fontconfig-config && \
         
 EXPOSE 8080
 
-CMD [" /usr/local/tomcat/bin/catalina.sh","run"]
+CMD ["/usr/local/tomcat/bin/catalina.sh","run"]
          
