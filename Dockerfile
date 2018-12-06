@@ -1,30 +1,36 @@
-FROM soxueren/tomcat:8.5-jre8-gdal
+#!/bin/sh
 
-ENV GEOSERVER-VERSION 2.14.0
+cat <<EOF > ./Dockerfile
+# This file is a template, and might need editing before it works on your project.
+FROM soxueren/tomcat:8.5-jre8-alpine
 
+RUN mkdir /data
 RUN mkdir /root/data
 RUN mkdir /root/data/jdbcconfig
 RUN mkdir /root/data/jdbcstore
 
-RUN wget https://excellmedia.dl.sourceforge.net/project/geoserver/GeoServer/${GEOSERVER-VERSION}/geoserver-${GEOSERVER-VERSION}-bin.zip -O /tmp/geoserver-${GEOSERVER-VERSION}-bin.zip
-         unzip -o ~/geoserver-${GEOSERVER-VERSION}-bin.zip -d /tmp/ && \   
-         mv /tmp/geoserver-${GEOSERVER-VERSION}-bin/webapps/geoserver  /usr/local/tomcat/webapps/ && \
-         mv /tmp/geoserver-${GEOSERVER-VERSION}-bin/data_dir  /root/data && \
-         rm -rf  /tmp/*         
+#install geoserver
+COPY ./geoserver.zip /data
+COPY ./data.zip /data
+COPY ./fonts.zip /data
 
-COPY ./web.xml /usr/local/tomcat/webapps/geoserver/WEB-INF/web.xml
+RUN unzip -o /data/geoserver.zip -d /usr/local/tomcat/webapps
+RUN unzip -n /data/fonts.zip -d /usr/share/fonts
+RUN rm -rf /data/fonts.zip /data/geoserver.zip
+
+# refresh system fonts
+RUN cd /usr/share/fonts     &&  chmod 644 *     &&  mkfontscale     &&  mkfontdir     &&  fc-cache -fv
+
+#install jai-1_1_3 and jai-imageio
 COPY ./imageio/jai_imageio-1_1/lib/*.so /usr/local/tomcat/native-jni-lib
 COPY ./imageio/jai-1_1_3/lib/*.so /usr/local/tomcat/native-jni-lib
 
-# add fonts
-#ADD fontxp.zip /usr/share/fonts/
+ADD ./start.sh /start.sh
+RUN chmod +x /start.sh
 
-# cache fonts
-RUN dpkg-reconfigure fontconfig-config && \
-        dpkg-reconfigure fontconfig && \
-        fc-cache -fv
-        
 EXPOSE 8080
 
-CMD ["/usr/local/tomcat/bin/catalina.sh","run"]
-         
+ENTRYPOINT ["/start.sh"]
+
+EOF
+cat ./Dockerfile
