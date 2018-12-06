@@ -48,8 +48,7 @@
       <param-value>http://82.58.146.45/geoserver</param-value>
     </context-param>
      -->
-   
-   
+
     <context-param>
        <param-name>GEOSERVER_DATA_DIR</param-name>
         <param-value>/root/data</param-value>
