@@ -1,7 +1,3 @@
-#!/bin/sh
-
-cat <<EOF > ./Dockerfile
-# This file is a template, and might need editing before it works on your project.
 FROM soxueren/tomcat:8.5-jre8-alpine
 
 RUN mkdir /data
@@ -31,6 +27,3 @@ RUN chmod +x /start.sh
 EXPOSE 8080
 
 ENTRYPOINT ["/start.sh"]
-
-EOF
-cat ./Dockerfile
